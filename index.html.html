@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Santina View Cocktail Wheel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .tropical-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+      z-index: -1;
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+      margin: 20px 0;
+      font-size: 2.5em;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    .wheel-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 500px;
+      height: 500px;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 15px solid #fff;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+
+    /* Keyframes for the wobble animation */
+    @keyframes pointer-wobble {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      25% { transform: translateX(-50%) rotate(-3deg); }
+      75% { transform: translateX(-50%) rotate(3deg); }
+    }
+
+    .pointer {
+      position: absolute;
+      top: -5px;
+      /* Base transform only (no wobble) */
+      left: 50%;
+      transform: translateX(-50%); 
+      width: 0;
+      height: 0;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-top: 50px solid #FFD700;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      z-index: 10;
+      /* Animation removed from base class */
+    }
+
+    /* Class to apply the wobble animation ONLY when spinning */
+    .pointer.wobbling {
+        animation: pointer-wobble 0.5s infinite alternate ease-in-out;
+    }
+
+    .center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 50%;
+      border: 5px solid white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .center-circle:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .center-circle:active {
+      transform: translate(-50%, -50%) scale(0.98);
+    }
+
+    .center-circle.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .controls {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .controls h2 {
+      color: #764ba2;
+      margin-bottom: 20px;
+    }
+
+    .cocktail-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .cocktail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid;
+    }
+
+    .cocktail-name {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .remove-btn {
+      padding: 5px 15px;
+      background: #f5576c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .remove-btn:hover {
+      background: #d63447;
+    }
+
+    .add-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #eee;
+    }
+
+    .add-section input, .add-section select, .add-section textarea {
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: Arial, sans-serif;
+    }
+
+    .add-section textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .add-btn {
+      padding: 12px;
+      background: #12c2e9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1em;
+    }
+
+    .add-btn:hover {
+      background: #0fa3c4;
+    }
+
+    .banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+      color: white;
+      padding: 40px 60px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      z-index: 1000;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .banner.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      line-height: 1;
+      transition: transform 0.2s;
+    }
+    
+    .close-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .banner h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+
+    #winnerText {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .recipe {
+      text-align: left;
+      background: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .recipe h3 {
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+
+    .recipe ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .recipe li, .recipe p {
+      margin: 5px 0;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .recipe .method {
+      margin-top: 15px;
+    }
+
+    .banner-actions {
+      margin-top: 20px;
+      display: flex; 
+      gap: 15px; 
+      justify-content: center;
+    }
+
+    .remove-winner-btn, .spin-again-btn {
+      color: white;
+      border: 2px solid white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .remove-winner-btn {
+      background: #ff6b6b; /* Red */
+    }
+
+    .remove-winner-btn:hover {
+      background: #fa5252;
+      transform: scale(1.05);
+    }
+    
+    .spin-again-btn {
+      background: #4ecdc4; /* Turquoise for Spin Again */
+    }
+    
+    .spin-again-btn:hover {
+      background: #39b3a7;
+      transform: scale(1.05);
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #f0f;
+      position: absolute;
+      animation: confetti-fall 3s linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .spirit-label {
+      font-size: 0.8em;
+      color: #666;
+      font-style: italic;
+    }
+
+    .filter-section {
+      background: #f0f8ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filter-section h3 {
+      margin-bottom: 10px;
+      color: #0093E9;
+      font-size: 1.1em;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .filter-option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .filter-option label {
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 600px) {
+      .wheel-wrapper {
+        width: 350px;
+        height: 350px;
+      }
+      h1 {
+        font-size: 2em;
+      }
+      .controls {
+        padding: 20px;
+      }
+      .banner {
+        width: 90%;
+        max-width: none;
+        padding: 30px 20px;
+      }
+      .banner-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .remove-winner-btn, .spin-again-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="tropical-bg"></div>
+  
+  <h1>🥂 Santina View Cocktail Wheel 🥂</h1>
+  
+  <div class="container">
+    <div class="wheel-container">
+      <div class="wheel-wrapper">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="500" height="500"></canvas>
+        <div class="center-circle" id="spinBtn" onclick="spin()">SPIN</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <h2>Manage Cocktails</h2>
+      
+      <div class="filter-section">
+        <h3>Filter by Spirit Type</h3>
+        <div class="filter-options">
+          <div class="filter-option">
+            <input type="checkbox" id="filter-gin" value="gin" checked onchange="updateFilters()">
+            <label for="filter-gin">Gin</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="filter-vodka" value="vodka" checked onchange="updateFilters()">
+            <label for="filter-vodka">Vodka</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="filter-rum" value="rum" checked onchange="updateFilters()">
+            <label for="filter-rum">Rum</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="filter-tequila" value="tequila" checked onchange="updateFilters()">
+            <label for="filter-tequila">Tequila</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="filter-whiskey" value="whiskey" checked onchange="updateFilters()">
+            <label for="filter-whiskey">Whiskey</label>
+          </div>
+          <div class="filter-option">
+            <input type="checkbox" id="filter-other" value="other" checked onchange="updateFilters()">
+            <label for="filter-other">Other</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cocktail-list" id="cocktailList"></div>
+      
+      <div class="add-section">
+        <input type="text" id="newCocktail" placeholder="Cocktail name" />
+        <select id="spiritType">
+          <option value="gin">Gin</option>
+          <option value="vodka">Vodka</option>
+          <option value="rum">Rum</option>
+          <option value="tequila">Tequila</option>
+          <option value="whiskey">Whiskey</option>
+          <option value="other">Other</option>
+        </select>
+        <textarea id="ingredientsList" placeholder="Ingredients (one per line)"></textarea>
+        <textarea id="methodText" placeholder="Method/Instructions"></textarea>
+        <button class="add-btn" onclick="addCocktail()">Add Cocktail</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner" id="banner">
+    <span class="close-btn" onclick="closeBanner()">&times;</span>
+    <h2>🎉 Winner! 🎉</h2>
+    <p id="winnerText"></p>
+    <div class="recipe" id="recipeText"></div>
+    <div class="banner-actions">
+      <button class="spin-again-btn" onclick="closeBanner()">Spin Again</button>
+      <button class="remove-winner-btn" onclick="removeWinner()">Remove from Wheel</button>
+    </div>
+  </div>
+
+  <script>
+    const spiritColors = {
+      // UPDATED TROPICAL COLORS (Rum is now Lime Zest Green)
+      gin: '#4ECDC4',     // Electric Blue/Turquoise
+      vodka: '#FFD9AA',   // Light Peach
+      rum: '#A8E61D',      // Lime Zest Green (NEW)
+      tequila: '#FFE66D',  // Tropical Yellow
+      whiskey: '#FA8072',  // Sunset Orange (Remains distinct from green)
+      other: '#C74BFF'    // Hot Pink
+    };
+    
+    // Cocktail list reordered for color intermixing on the wheel (from previous step)
+    let cocktails = [
+      { 
+        name: 'Whisky Sour', 
+        spirit: 'whiskey',
+        ingredients: ['2 parts bourbon whisky', '0.75 parts lemon juice', '0.5 part simple syrup', '1 egg white (around 15ml for one drink)'],
+        method: 'Combine all ingredients to a cocktail shaker without ice and shake for 15 – 20 seconds. Add ice cubes and shake for another 15 – 20 seconds before serving in a tumbler with ice.'
+      },
+      { 
+        name: 'Tropical Sunset', 
+        spirit: 'rum',
+        ingredients: ['2 parts pineapple juice', '1 part coconut or white rum', '1 part orange juice', '0.5 parts grenadine'],
+        method: 'Combine juice, rum and ice in a cocktail shaker, shake hard and fine strain into a glass. Pour grenadine over the drink using a bar spoon.'
+      },
+      { 
+        name: 'Blue Velvet', 
+        spirit: 'vodka',
+        ingredients: ['2 parts vodka', '1 part blue curacao', '1 part white chocolate liqueur'],
+        method: 'Combine all ingredients into a cocktail shaker with ice, shake hard and fine strain into a cocktail glass.'
+      },
+      { 
+        name: 'Charlie Chaplin', 
+        spirit: 'gin',
+        ingredients: ['1.5 parts sloe gin', '1 part lime juice', '0.75 parts apricot (or peach) liqueur', '0.25 parts simple syrup'],
+        method: 'Add all ingredients to a cocktail shaker with ice, shake hard and fine strain into a chilled cocktail glass.'
+      },
+      { 
+        name: 'Sidecar', 
+        spirit: 'tequila',
+        ingredients: ['2 parts tequila resposado or anejo', '1 part triple sec or Cointreau', '1 part lemon juice', '(optional) 2 dashes angostura bitters'],
+        method: 'Combine all ingredients into a cocktail shaker with ice, shake hard and fine strain into a cocktail glass. Optional 0.75 parts for triple sec/Cointreau. Optional sub tequila with cognac (preferably VS).'
+      },
+      { 
+        name: 'Toblerone', 
+        spirit: 'other',
+        ingredients: ['2 parts milk (or cream)', '1 part Irish cream (i.e. baileys)', '1 part coffee liqueur', '1 part hazelnut liqueur (i.e. Frangelico)', 'Optional toppings: hot chocolate powder, honey or chocolate shavings'],
+        method: 'Combine all ingredients to a cocktail shaker with ice, shake and fine strain into a cocktail glass. Optionally top the drink with hot chocolate powder, honey or chocolate shavings.'
+      },
+      { 
+        name: 'New York Sour', 
+        spirit: 'whiskey',
+        ingredients: ['2 parts bourbon or rye whisky', '1 part lemon juice', '0.75 parts simple syrup', '1 egg white', '0.5 parts red wine (preferably cab sav)'],
+        method: 'Combine first four ingredients to a cocktail shaker without ice and shake for 15 – 20 seconds. Add ice cubes and shake for another 15 – 20 seconds. Pour the drink into a tumbler glass and pour the red wine over a partially submerged bar spoon.'
+      },
+      { 
+        name: 'Malibu Sunset', 
+        spirit: 'rum',
+        ingredients: ['4 parts pineapple juice', '2 parts coconut rum (optional half white half coconut)', '0.5 parts grenadine'],
+        method: 'Add pineapple juice and rum to a cocktail shaker with ice, shake hard and fine strain into a cocktail glass. Slowly pour grenadine over the drink using a bar spoon.'
+      },
+      { 
+        name: 'Black Russian', 
+        spirit: 'vodka',
+        ingredients: ['2 parts vodka', '1 part coffee liqueur'],
+        method: 'Fill a glass with ice and add vodka and coffee liqueur.'
+      },
+      { 
+        name: 'Bramble', 
+        spirit: 'gin',
+        ingredients: ['3 parts gin', '2 parts lemon juice', '1 part sugar syrup', '1 part blackberry or blackcurrent liqueur', '(optional) 0.5 parts Chambord'],
+        method: 'Add all ingredients (except Chambord if using) to a cocktail shaker with ice, shake hard and fine strain into a chilled cocktail glass. Slowly pour in Chambord.'
+      },
+      { 
+        name: 'Margarita', 
+        spirit: 'tequila',
+        ingredients: ['2 parts bianco tequila', '1 part triple sec or Cointreau', '0.75 parts lime juice'],
+        method: 'Combine all ingredients into a cocktail shaker with ice, shake hard and fine strain into a cocktail glass. Optional ratios of 1.5:1.5:1 or 2:1:1.'
+      },
+      { 
+        name: 'Manhattan', 
+        spirit: 'whiskey',
+        ingredients: ['2 parts whisky', '1 part sweet vermouth (optional half and half)', '(Optional) 2 dashes angostura bitters'],
+        method: 'Add all ingredients to a mixing glass with ice and stir. Strain into a tumbler filled with ice.'
+      },
+      { 
+        name: 'Painkiller', 
+        spirit: 'rum',
+        ingredients: ['4 parts pineapple juice', '2 parts dark rum', '1 part orange juice', '1 part cream of coconut'],
+        method: 'Combine all ingredients in a cocktail shaker with ice, shake until well mixed and strain into a glass.'
+      },
+      { 
+        name: 'White Russian', 
+        spirit: 'vodka',
+        ingredients: ['2 parts vodka', '1 part coffee liqueur', '1 part heavy cream'],
+        method: 'Fill a glass with ice and add vodka and coffee liqueur. Add cream on top, optional slowly pour the cream over the back of a spoon so it floats on top.'
+      },
+      { 
+        name: 'Martini', 
+        spirit: 'gin',
+        ingredients: ['2 parts gin', '1 part dry vermouth', '2 dashes orange bitters'],
+        method: 'Add gin, dry vermouth and orange bitters together with ice and stir for 30 seconds before straining into a glass (can be shaken but cocktails with only alcohol should be stirred). Add to glass and add two dashes of orange bitters.'
+      },
+      { 
+        name: 'Revolver', 
+        spirit: 'whiskey',
+        ingredients: ['2 parts whisky bourbon', '0.5 parts coffee liqueur', '2 dashes orange bitters'],
+        method: 'Add all ingredients to a mixing glass with ice and stir. Strain into a tumbler filled with ice.'
+      },
+      { 
+        name: 'Okonkulucooler', 
+        spirit: 'rum',
+        ingredients: ['2 parts pineapple juice', '2 parts light rum', '1.5 parts lemon juice', '1 part Chambord', '1 part dark rum', '2 dashes angostura bitters'],
+        method: 'Combine all ingredients in a cocktail shaker with ice, shake until well mixed and strain into a glass.'
+      },
+      { 
+        name: 'Moscow Mule', 
+        spirit: 'vodka',
+        ingredients: ['4 parts ginger beer', '2 parts vodka', '0.5 parts lime juice'],
+        method: 'Fille a copper mug or glass with ice. Pour in vodka and lime juice and fill the glass with ginger beer and stir with a spoon. Change with bourbon / whisky / gin / tequila / rum to make a Kentucky mule / Horsefeather / Gin-Gin Mule / Mexican Mule / Jamaican or Cuban Mule.'
+      },
+      { 
+        name: 'Old Fashioned', 
+        spirit: 'whiskey',
+        ingredients: ['2 parts whisky bourbon', '0.25 parts simple syrup', '2 dashes angostura bitters', '2 dashes orange bitters', '(optional) 0.25 parts maple syrup'],
+        method: 'Add all ingredients to a glass with ice and stir well.'
+      },
+      { 
+        name: 'Daiquiri', 
+        spirit: 'rum',
+        ingredients: ['4 parts light or gold rum', '2 parts lime juice', '1 part simple syrup'],
+        method: 'Combine all ingredients in a cocktail shaker with ice, shake until well mixed and strain into a cocktail glass. Optional ratios of 2:0.75:0.5 or 2:1:0.75.'
+      },
+      { 
+        name: 'Frangelico Fashioned', 
+        spirit: 'whiskey',
+        ingredients: ['1 part whisky bourbon', '1 part Frangelico', '0.25 parts simple syrup', '2 dashes angostura bitters', '2 dashes orange bitters'],
+        method: 'Add all ingredients to a glass with ice and stir well.'
+      },
+      { 
+        name: 'Mai Tai', 
+        spirit: 'rum',
+        ingredients: ['3 parts pineapple juice', '2 parts orange juice', '1 part dark rum', '0.5 parts coconut rum', '1 teaspoon grenadine'],
+        method: 'Combine all ingredients into a shaker half filled with ice cubes. Shake hard and fine strain into a cocktail glass.'
+      },
+      { 
+        name: 'Paper Plane', 
+        spirit: 'whiskey',
+        ingredients: ['1 part bourbon whisky', '1 part Aperol', '1 part Amaro nonino or Campari', '1 part lemon juice'],
+        method: 'Add all ingredients to a cocktail shaker with ice and shake. Strain in to a cocktail glass.'
+      },
+      { 
+        name: 'Pina Colada', 
+        spirit: 'rum',
+        ingredients: ['3 parts pineapple juice', '2 parts coconut rum', '1 part coconut milk / cream of coconut'],
+        method: 'Combine all ingredients into a cocktail shaker with ice, shake hard and fine strain into a cocktail glass.'
+      },
+      { 
+        name: 'Blood and Sand', 
+        spirit: 'whiskey',
+        ingredients: ['1 part whisky (ideally scotch)', '1 part cherry brandy', '1 part rosso vermouth', '1 part orange juice'],
+        method: 'Combine all ingredients to a cocktail shaker with ice and shake. Strain into a coupe glass.'
+      }
+    ];
+
+    let spinning = false;
+    let activeFilters = ['gin', 'vodka', 'rum', 'tequila', 'whiskey', 'other'];
+    let currentRotation = 0;
+    let currentWinningCocktail = null;
+
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const pointer = document.querySelector('.pointer'); // Get reference to the pointer element
+
+    // --- Local Storage Functions for Persistence ---
+    function saveCocktails() {
+      localStorage.setItem('cocktails', JSON.stringify(cocktails));
+    }
+
+    function loadCocktails() {
+      const savedCocktails = localStorage.getItem('cocktails');
+      // Only load from storage if there's content. If the user deleted the local storage 
+      // or this is the first load, use the updated default list.
+      if (savedCocktails) {
+        cocktails = JSON.parse(savedCocktails);
+      }
+    }
+    // ---------------------------------------------
+
+    function getFilteredCocktails() {
+      return cocktails.filter(c => activeFilters.includes(c.spirit));
+    }
+
+    function updateFilters() {
+      activeFilters = [];
+      ['gin', 'vodka', 'rum', 'tequila', 'whiskey', 'other'].forEach(spirit => {
+        const checkbox = document.getElementById(`filter-${spirit}`);
+        if (checkbox.checked) {
+          activeFilters.push(spirit);
+        }
+      });
+      drawWheel();
+    }
+
+    function drawWheel() {
+      const filteredCocktails = getFilteredCocktails();
+      const numSegments = filteredCocktails.length;
+      
+      if (numSegments === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ccc';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#666';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Select at least one spirit type', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+      
+      const anglePerSegment = (2 * Math.PI) / numSegments;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2 - 15;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numSegments; i++) {
+        const angle = i * anglePerSegment;
+        const cocktail = filteredCocktails[i];
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angle, angle + anglePerSegment);
+        ctx.closePath();
+        
+        ctx.fillStyle = spiritColors[cocktail.spirit];
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + anglePerSegment / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(cocktail.name, radius - 20, 5);
+        ctx.restore();
+      }
+    }
+
+    function updateCocktailList() {
+      const list = document.getElementById('cocktailList');
+      list.innerHTML = '';
+      
+      cocktails.forEach((cocktail, index) => {
+        const item = document.createElement('div');
+        item.className = 'cocktail-item';
+        item.style.borderLeftColor = spiritColors[cocktail.spirit];
+        item.innerHTML = `
+          <span class="cocktail-name">
+            ${cocktail.name}
+            <span class="spirit-label">(${cocktail.spirit})</span>
+          </span>
+          <button class="remove-btn" onclick="removeCocktail(${index})">Remove</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function addCocktail() {
+      const nameInput = document.getElementById('newCocktail');
+      const spiritSelect = document.getElementById('spiritType');
+      const ingredientsInput = document.getElementById('ingredientsList');
+      const methodInput = document.getElementById('methodText');
+      const name = nameInput.value.trim();
+      
+      if (name) {
+        const ingredientsText = ingredientsInput.value.trim();
+        const ingredients = ingredientsText ? ingredientsText.split('\n').filter(i => i.trim()) : ['Custom ingredients - add your own!'];
+        const method = methodInput.value.trim() || 'Add your preparation method here.';
+        
+        cocktails.push({ 
+          name, 
+          spirit: spiritSelect.value,
+          ingredients: ingredients,
+          method: method
+        });
+        nameInput.value = '';
+        ingredientsInput.value = '';
+        methodInput.value = '';
+        saveCocktails();
+        drawWheel();
+        updateCocktailList();
+      }
+    }
+
+    function removeCocktail(index) {
+      cocktails.splice(index, 1);
+      saveCocktails();
+      drawWheel();
+      updateCocktailList();
+    }
+
+    function spin() {
+      const filteredCocktails = getFilteredCocktails();
+      if (spinning || filteredCocktails.length === 0) return;
+      
+      spinning = true;
+      const spinBtn = document.getElementById('spinBtn');
+      spinBtn.classList.add('disabled');
+      
+      const wheel = document.getElementById('wheel');
+      // START WOBBLE
+      pointer.classList.add('wobbling'); 
+      
+      const rotations = 5 + Math.random() * 5;
+      const degrees = rotations * 360; 
+      const randomOffset = Math.floor(Math.random() * 360);
+      
+      currentRotation += (degrees + randomOffset);
+      
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+      
+      setTimeout(() => {
+        // STOP WOBBLE
+        pointer.classList.remove('wobbling'); 
+
+        const anglePerSegment = 360 / filteredCocktails.length;
+        const normalizedRotation = currentRotation % 360;
+        
+        const segmentUnderPointer = Math.floor(((360 - normalizedRotation + 270) % 360) / anglePerSegment);
+        const winningIndex = segmentUnderPointer % filteredCocktails.length;
+        
+        showWinner(filteredCocktails[winningIndex]);
+        
+        setTimeout(() => {
+          spinning = false;
+          spinBtn.classList.remove('disabled');
+        }, 1000);
+      }, 4000);
+    }
+
+    function closeBanner() {
+      document.getElementById('banner').classList.remove('show');
+    }
+
+    function showWinner(cocktail) {
+      currentWinningCocktail = cocktail;
+      
+      const banner = document.getElementById('banner');
+      const winnerText = document.getElementById('winnerText');
+      const recipeText = document.getElementById('recipeText');
+      
+      winnerText.textContent = cocktail.name;
+      
+      let recipeHTML = '<h3>Ingredients:</h3><ul>';
+      cocktail.ingredients.forEach(ing => {
+        recipeHTML += `<li>${ing}</li>`;
+      });
+      recipeHTML += '</ul><div class="method"><h3>Method:</h3><p>' + cocktail.method + '</p></div>';
+      
+      recipeText.innerHTML = recipeHTML;
+      banner.classList.add('show');
+      
+      createConfetti();
+    }
+
+    function removeWinner() {
+      if (!currentWinningCocktail) return;
+      
+      const index = cocktails.indexOf(currentWinningCocktail);
+      if (index > -1) {
+        cocktails.splice(index, 1);
+        saveCocktails();
+        drawWheel();
+        updateCocktailList();
+        closeBanner();
+      }
+    }
+    
+    function createConfetti() {
+      // Confetti colors updated to match the tropical theme
+      const colors = ['#4ECDC4', '#A8E61D', '#FFE66D', '#FA8072', '#C74BFF', '#FFFFFF'];
+      const particleCount = 150; 
+      
+      for (let i = 0; i < particleCount; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          
+          const size = (5 + Math.random() * 10) + 'px';
+          confetti.style.width = size;
+          confetti.style.height = size;
+          
+          confetti.style.left = (Math.random() * 120) - 10 + '%'; 
+          confetti.style.top = '-10px';
+          confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+          
+          confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+          confetti.style.animationDuration = (2 + Math.random() * 3) + 's'; 
+          
+          document.body.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 5000);
+        }, i * 15);
+      }
+    }
+
+    document.getElementById('newCocktail').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addCocktail();
+    });
+    
+    // Initialize by loading data first (will use the new default list if no storage data exists)
+    loadCocktails();
+    drawWheel();
+    updateCocktailList();
+  </script>
+</body>
+</html>
