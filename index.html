@@ -456,31 +456,33 @@
     
     // THE DEFAULT LIST (Saved as a constant for restoration)
     const DEFAULT_COCKTAILS = [
-      { name: 'Whisky Sour', spirit: 'whiskey', ingredients: ['2 parts bourbon whisky', '0.75 parts lemon juice', '0.5 part simple syrup', '1 egg white'], method: 'Shake without ice, then with ice. Strain into tumbler.' },
-      { name: 'Tropical Sunset', spirit: 'rum', ingredients: ['2 parts pineapple juice', '1 part coconut or white rum', '1 part orange juice', '0.5 parts grenadine'], method: 'Shake juice/rum. Strain. Pour grenadine over spoon.' },
+      { name: 'Whisky Sour', spirit: 'whiskey', ingredients: ['2 parts bourbon whisky', '0.75 parts lemon juice', '0.5 part simple syrup', '1 egg white'], method: 'Combine all ingredients and shake without ice for 10 - 15 seconds, then add ice and shake for 15 - 20 seconds. Strain into tumbler.' },
+      { name: 'Tropical Sunset', spirit: 'rum', ingredients: ['2 parts pineapple juice', '1 part coconut or white rum', '1 part orange juice', '0.5 parts grenadine'], method: 'Combine juice and rum and shake with ice for 15 - 20 seconds. Strain into a glass and pour grenadine over spoon.' },
       { name: 'Blue Velvet', spirit: 'vodka', ingredients: ['2 parts vodka', '1 part blue curacao', '1 part white chocolate liqueur'], method: 'Shake with ice, fine strain into cocktail glass.' },
       { name: 'Charlie Chaplin', spirit: 'gin', ingredients: ['1.5 parts sloe gin', '1 part lime juice', '0.75 parts apricot liqueur', '0.25 parts simple syrup'], method: 'Shake with ice, fine strain into chilled glass.' },
+      { name: 'Pina Colada', spirit: 'rum', ingredients: ['3 parts pineapple juice', '2 parts coconut rum', '1 part coconut milk'], method: 'Shake hard with ice. Fine strain.' },
       { name: 'Sidecar', spirit: 'tequila', ingredients: ['2 parts tequila resposado', '1 part triple sec', '1 part lemon juice'], method: 'Shake with ice, fine strain into glass.' },
+      { name: 'New York Sour', spirit: 'whiskey', ingredients: ['2 parts bourbon/rye', '1 part lemon juice', '0.75 parts simple syrup', '1 egg white', '0.5 parts red wine'], method: 'Combine all ingredients except red wine and shake in cocktail shaker before straining into a glass. Float red wine into the glass over a bar spoon.' },
       { name: 'Toblerone', spirit: 'other', ingredients: ['2 parts milk/cream', '1 part Irish cream', '1 part coffee liqueur', '1 part hazelnut liqueur'], method: 'Shake with ice, fine strain into glass.' },
-      { name: 'New York Sour', spirit: 'whiskey', ingredients: ['2 parts bourbon/rye', '1 part lemon juice', '0.75 parts simple syrup', '1 egg white', '0.5 parts red wine'], method: 'Shake first 4, pour. Float red wine over spoon.' },
-      { name: 'Malibu Sunset', spirit: 'rum', ingredients: ['4 parts pineapple juice', '2 parts coconut rum', '0.5 parts grenadine'], method: 'Shake juice/rum. Strain. Slowly pour grenadine.' },
-      { name: 'Black Russian', spirit: 'vodka', ingredients: ['2 parts vodka', '1 part coffee liqueur'], method: 'Build in glass over ice.' },
-      { name: 'Bramble', spirit: 'gin', ingredients: ['3 parts gin', '2 parts lemon juice', '1 part sugar syrup', '1 part blackberry liqueur'], method: 'Shake all but liqueur. Strain. Pour liqueur over.' },
+      { name: 'Vanessa Polk', spirit: 'rum', ingredients: ['2 parts anejo rum, 1 part cherry liqueur, 6 drops chocolate bitters, 1 dash aromatic bitters'], method: 'Stir all ingredients with ice and fine strain into a chilled glass' },
+      { name: 'Paper Plane', spirit: 'whiskey', ingredients: ['1 part bourbon', '1 part Aperol', '1 part Amaro nonino', '1 part lemon juice'], method: 'Shake with ice. Strain into glass.' },
+      { name: 'Black Russian', spirit: 'vodka', ingredients: ['2 parts vodka', '1 part coffee liqueur'], method: 'Fill a glass with ice, pour the vodka then the coffee liqueur and gently stir until chilled.' },
+      { name: 'Mai Tai', spirit: 'rum', ingredients: ['3 parts pineapple juice', '2 parts orange juice', '1 part dark rum', '0.5 parts coconut rum', '1 tsp grenadine'], method: 'Shake with ice. Fine strain.' },
+      { name: 'Bramble', spirit: 'gin', ingredients: ['3 parts gin', '2 parts lemon juice', '1 part sugar syrup', '1 part blackberry liqueur'], method: 'Combine gin, lemon juice and sugar syrup together, shake and strain into a glass. Pour liqueur over the drink.' },
       { name: 'Margarita', spirit: 'tequila', ingredients: ['2 parts bianco tequila', '1 part triple sec', '0.75 parts lime juice'], method: 'Shake with ice, fine strain into cocktail glass.' },
       { name: 'Manhattan', spirit: 'whiskey', ingredients: ['2 parts whisky', '1 part sweet vermouth', '2 dashes angostura'], method: 'Stir with ice. Strain into glass.' },
       { name: 'Painkiller', spirit: 'rum', ingredients: ['4 parts pineapple juice', '2 parts dark rum', '1 part orange juice', '1 part cream of coconut'], method: 'Shake with ice, strain into glass.' },
-      { name: 'White Russian', spirit: 'vodka', ingredients: ['2 parts vodka', '1 part coffee liqueur', '1 part heavy cream'], method: 'Build vodka/kahlua. Float cream on top.' },
+      { name: 'Blood and Sand', spirit: 'whiskey', ingredients: ['1 part scotch', '1 part cherry brandy', '1 part rosso vermouth', '1 part orange juice'], method: 'Shake with ice. Strain into coupe.' },
+      { name: 'White Russian', spirit: 'vodka', ingredients: ['2 parts vodka', '1 part coffee liqueur', '1 part heavy cream'], method: 'Add vodka to a glass with ice, then add coffee liqueur before floating cream on top.' },
+      { name: 'Malibu Sunset', spirit: 'rum', ingredients: ['4 parts pineapple juice', '2 parts coconut rum', '0.5 parts grenadine'], method: 'Combine and shake juice and rum together before straining into a glass. Half submerge a bar spoon and pour grenadine over the spoon.' },
       { name: 'Martini', spirit: 'gin', ingredients: ['2 parts gin', '1 part dry vermouth', '2 dashes orange bitters'], method: 'Stir for 30 seconds with ice. Strain.' },
       { name: 'Revolver', spirit: 'whiskey', ingredients: ['2 parts bourbon', '0.5 parts coffee liqueur', '2 dashes orange bitters'], method: 'Stir with ice. Strain.' },
       { name: 'Okonkulucooler', spirit: 'rum', ingredients: ['2 parts pineapple juice', '2 parts light rum', '1.5 parts lemon juice', '1 part Chambord', '1 part dark rum'], method: 'Shake all with ice. Strain.' },
-      { name: 'Moscow Mule', spirit: 'vodka', ingredients: ['4 parts ginger beer', '2 parts vodka', '0.5 parts lime juice'], method: 'Build in copper mug with ice. Stir.' },
+      { name: 'Moscow Mule', spirit: 'vodka', ingredients: ['4 parts ginger beer', '2 parts vodka', '0.5 parts lime juice'], method: 'Add vodka, ginger beer and lime juice in copper mug with ice. Stir.' },
       { name: 'Old Fashioned', spirit: 'whiskey', ingredients: ['2 parts bourbon', '0.25 parts simple syrup', '2 dashes angostura', '2 dashes orange bitters'], method: 'Stir in glass with ice.' },
       { name: 'Daiquiri', spirit: 'rum', ingredients: ['4 parts light/gold rum', '2 parts lime juice', '1 part simple syrup'], method: 'Shake with ice. Strain into cocktail glass.' },
       { name: 'Frangelico Fashioned', spirit: 'whiskey', ingredients: ['1 part bourbon', '1 part Frangelico', '0.25 parts simple syrup', '2 dashes angostura'], method: 'Stir in glass with ice.' },
-      { name: 'Mai Tai', spirit: 'rum', ingredients: ['3 parts pineapple juice', '2 parts orange juice', '1 part dark rum', '0.5 parts coconut rum', '1 tsp grenadine'], method: 'Shake with ice. Fine strain.' },
-      { name: 'Paper Plane', spirit: 'whiskey', ingredients: ['1 part bourbon', '1 part Aperol', '1 part Amaro nonino', '1 part lemon juice'], method: 'Shake with ice. Strain into glass.' },
-      { name: 'Pina Colada', spirit: 'rum', ingredients: ['3 parts pineapple juice', '2 parts coconut rum', '1 part coconut milk'], method: 'Shake hard with ice. Fine strain.' },
-      { name: 'Blood and Sand', spirit: 'whiskey', ingredients: ['1 part scotch', '1 part cherry brandy', '1 part rosso vermouth', '1 part orange juice'], method: 'Shake with ice. Strain into coupe.' }
+      { name: 'Hawaiian Mimosa', spirit: 'rum', ingredients: ['750 ml champagne or prosecco', '1 and a quarter cup coconut rum', '1 and two-thirds cups pineapple juice', '90 ml grenadine'], method: 'Large batch, combine all ingredients except grenadine and pour grenadine over the top. Keep in a pitcher or punch bowl' }
     ];
 
     let cocktails = [];
